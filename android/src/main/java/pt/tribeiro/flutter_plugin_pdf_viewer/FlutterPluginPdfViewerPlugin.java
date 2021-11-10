@@ -53,9 +53,9 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
-        if (!clearCacheDir()) {
-            Log.d("NumPages", "getNumberOfPages: failed to clean cache.");
-        }
+//        if (!clearCacheDir()) {
+//            Log.d("NumPages", "getNumberOfPages: failed to clean cache.");
+//        }
     }
 
     @Override
