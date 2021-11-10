@@ -176,44 +176,34 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
     }
 
     private String getPage(String filePath, @Nullable Integer pageNumber) {
+        String ret = null;
         try (PdfRenderer renderer = new PdfRenderer(getPdfFile(filePath))) {
             final int pageCount = renderer.getPageCount();
             if (pageNumber == null || pageNumber > pageCount) {
                 pageNumber = pageCount;
             }
 
-            PdfRenderer.Page page = renderer.openPage(--pageNumber);
+            try (PdfRenderer.Page page = renderer.openPage(--pageNumber)) {
+                final int densityDpi = activity.getResources().getDisplayMetrics().densityDpi;
+                double width = densityDpi * page.getWidth();
+                double height = densityDpi * page.getHeight();
+                final double docRatio = width / height;
 
-            final int densityDpi = activity.getResources().getDisplayMetrics().densityDpi;
-            double width = densityDpi * page.getWidth();
-            double height = densityDpi * page.getHeight();
-            final double docRatio = width / height;
-
-            width = 2048;
-            height = (int) (width / docRatio);
-            Bitmap bitmap = Bitmap.createBitmap((int) width, (int) height, Bitmap.Config.ARGB_8888);
-            // Change background to white
-            Canvas canvas = new Canvas(bitmap);
-            canvas.drawColor(Color.WHITE);
-            // Render to bitmap
-            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-            String ret;
-            try {
+                width = 2048;
+                height = (int) (width / docRatio);
+                Bitmap bitmap = Bitmap.createBitmap((int) width, (int) height, Bitmap.Config.ARGB_8888);
+                // Change background to white
+                Canvas canvas = new Canvas(bitmap);
+                canvas.drawColor(Color.WHITE);
+                // Render to bitmap
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
                 ret = createTempPreview(bitmap, filePath, pageNumber);
-            } finally {
-                try {
-                    page.close();
-                    renderer.close();
-                } catch (Exception ignored) {
-                    // Nothing to do with close exceptions.
-                }
             }
-            return ret;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
         }
-        return null;
+        return ret;
     }
 
     @Override
