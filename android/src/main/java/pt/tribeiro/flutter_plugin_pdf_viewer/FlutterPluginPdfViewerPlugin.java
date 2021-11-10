@@ -45,6 +45,9 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        if (!clearCacheDir()) {
+            Log.d("NumPages", "getNumberOfPages: failed to clean cache.");
+        }
         channel = new MethodChannel(binding.getBinaryMessenger(), "flutter_plugin_pdf_viewer");
         channel.setMethodCallHandler(this);
         context = binding.getApplicationContext();
@@ -105,9 +108,6 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
     private String getNumberOfPages(String filePath) {
         try (PdfRenderer renderer = new PdfRenderer(getPdfFile(filePath))) {
             final int pageCount = renderer.getPageCount();
-            if (!clearCacheDir()) {
-                Log.d("NumPages", "getNumberOfPages: failed to clean cache.");
-            }
             return String.format(Locale.US, "%d", pageCount);
         } catch (Exception ex) {
             ex.printStackTrace();
