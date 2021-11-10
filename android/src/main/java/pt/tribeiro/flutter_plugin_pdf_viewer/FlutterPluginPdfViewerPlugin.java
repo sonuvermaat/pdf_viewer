@@ -135,7 +135,9 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
             File[] files = directory.listFiles(myFilter);
             // Log.d("Cache Files", "Size: " + files.length);
             for (File file : files != null ? files : new File[0]) {
-                if (!file.delete()) {
+                if (file.delete()) {
+                    Log.i("Cache files", String.format("Deleted file: %s", file.getName()));
+                } else {
                     Log.d("Cache files", String.format("Deleting file %s failed.", file.getName()));
                 }
             }
