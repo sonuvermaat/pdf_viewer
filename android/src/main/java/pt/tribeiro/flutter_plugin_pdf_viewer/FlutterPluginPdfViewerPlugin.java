@@ -199,8 +199,12 @@ public class FlutterPluginPdfViewerPlugin implements FlutterPlugin, MethodCallHa
             try {
                 ret = createTempPreview(bitmap, filePath, pageNumber);
             } finally {
-                page.close();
-                renderer.close();
+                try {
+                    page.close();
+                    renderer.close();
+                } catch (Exception ignored) {
+                    // Nothing to do with close exceptions.
+                }
             }
             return ret;
         } catch (Exception ex) {
